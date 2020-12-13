@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Dimensions, StyleSheet, Alert } from 'react-native';
 import { Icon, Input, Button } from 'react-native-elements';
-import { dbLocationsContext, dbCategoriesContext } from '../Store';
+import { useFocusEffect } from '@react-navigation/native';
+import { dbLocationsContext, dbCategoriesContext, currentScreenContext } from '../Store';
 import DbManager from '../database/DbManager';
 import DeleteModal from '../components/DeleteModal';
 import colors from '../res/colors';
@@ -12,6 +13,7 @@ const { width, height } = Dimensions.get('window')
 
 const EditCategoryScreen = ({ route, navigation }) => {
 
+    const [currentScreen, setCurrentScreen] = useContext(currentScreenContext);
     const [dbLocations, setDbLocations] = useContext(dbLocationsContext);
     const [dbCategories, setDbCategories] = useContext(dbCategoriesContext);
     const [category, setCategory] = useState({});
@@ -22,6 +24,12 @@ const EditCategoryScreen = ({ route, navigation }) => {
         setCategoryName(route.params.category.categoryName)
         setCategory(route.params.category)
     }, []);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setCurrentScreen(route.name)
+        }, [])
+    )
 
     const deleteCategory = async () => {
         await DbManager.deleteCategory(category)

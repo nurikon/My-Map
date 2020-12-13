@@ -64,7 +64,6 @@ const addLocation = async (props) => {
             "INSERT INTO mylocations(locationName, latitude, longitude, categoryId, categoryName, comment)" +
             `VALUES("${locationName}", "${latitude}", "${longitude}", "${categoryId}", "${categoryName}", "${comment}")`
         ).then(() => {
-            console.log('data eklendi')
             resolve(true);
         }).catch((err) => {
             console.log('EROR addTableTimes', err)
@@ -183,7 +182,6 @@ const updateCategoryVisible = async (item) => {
 
 const deleteCategory = async (item) => {
     await DB()
-    console.log('id', item)
     return new Promise((resolve) => {
         dbInstance.executeSql(
             "DELETE FROM categories WHERE id =" + item.id
@@ -202,7 +200,6 @@ const deleteCategory = async (item) => {
 
 const deleteLocation = async (id) => {
     await DB()
-    console.log('id', id)
     return new Promise((resolve) => {
         dbInstance.executeSql(
             "DELETE FROM mylocations WHERE id =" + id

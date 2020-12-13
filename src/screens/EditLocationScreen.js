@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
 import { Input, Icon, Button } from 'react-native-elements';
-import { selectedLocationContext, dbLocationsContext } from '../Store';
+import { useFocusEffect } from '@react-navigation/native';
+import { selectedLocationContext, dbLocationsContext, currentScreenContext } from '../Store';
 import Header from '../components/Header';
 import CategoriesModal from '../components/CategoriesModal';
 import DbManager from '../database/DbManager';
@@ -12,7 +13,8 @@ import colors from '../res/colors';
 const { width, height } = Dimensions.get('window')
 const { white, theme, inputUnderline, textBlack } = colors
 
-const EditLocationScreen = ({ navigation }) => {
+const EditLocationScreen = ({ navigation, route }) => {
+    const [currentScreen, setCurrentScreen] = useContext(currentScreenContext);
     const [dbLocations, setDbLocations] = useContext(dbLocationsContext);
     const [selectedLocation, setSelectedLocation] = useContext(selectedLocationContext);
     const [locationName, setLocationName] = useState("");
@@ -22,6 +24,12 @@ const EditLocationScreen = ({ navigation }) => {
     const [categoriesModalVisible, setCategoriesModalVisible] = useState(false);
     const [commentBarHeight, setCommentBarHeight] = useState();
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setCurrentScreen(route.name)
+        }, [])
+    )
 
     useState(() => {
         setLocationName(selectedLocation.locationName)

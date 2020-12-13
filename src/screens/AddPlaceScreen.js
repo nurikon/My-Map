@@ -1,7 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions, Text, Alert } from 'react-native';
 import { Input, Icon, Button } from 'react-native-elements';
-import { dbLocationsContext } from '../Store';
+import { useFocusEffect } from '@react-navigation/native';
+import { dbLocationsContext, currentScreenContext } from '../Store';
 import Header from '../components/Header';
 import DbManager from '../database/DbManager';
 import CategoriesModal from '../components/CategoriesModal';
@@ -12,6 +13,7 @@ const { inputUnderline, theme, lightGreen, textBlack, white, placeholderGray } =
 
 const AddPlaceScreen = ({ route, navigation }) => {
 
+    const [currentScreen, setCurrentScreen] = useContext(currentScreenContext);
     const [dbLocations, setDbLocations] = useContext(dbLocationsContext);
     const [locationName, setLocationName] = useState("");
     const [selectedCoordinates, setSelectedCoordinates] = useState(null);
@@ -23,6 +25,12 @@ const AddPlaceScreen = ({ route, navigation }) => {
     useEffect(() => {
         setSelectedCoordinates(route.params.location)
     }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+          setCurrentScreen(route.name)
+        }, [])
+      );
 
     const updateCommentBarHeight = (val) => {
         const height = val.nativeEvent.contentSize.height

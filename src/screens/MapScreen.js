@@ -4,7 +4,7 @@ import Geolocation from '@react-native-community/geolocation';
 import MapView, { Marker } from 'react-native-maps';
 import { useFocusEffect } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
-import { dbLocationsContext, dbCategoriesContext, selectedLocationContext } from '../Store';
+import { dbLocationsContext, dbCategoriesContext, selectedLocationContext, currentScreenContext } from '../Store';
 import DbManager from '../database/DbManager';
 import SearchBar from '../components/SearchBar';
 import LocationContent from '../components/LocationContent';
@@ -15,7 +15,8 @@ const { width, height } = Dimensions.get('window')
 const { theme, green, white } = colors
 let mapView
 
-const MapScreen = ({ navigation }) => {
+const MapScreen = ({ navigation, route }) => {
+  const [currentScreen, setCurrentScreen] = useContext(currentScreenContext);
   const [dbLocations, setDbLocations] = useContext(dbLocationsContext);
   const [dbCategories, setDbCategories] = useContext(dbCategoriesContext);
   const [selectedLocation, setSelectedLocation] = useContext(selectedLocationContext);
@@ -31,9 +32,11 @@ const MapScreen = ({ navigation }) => {
 
   useEffect(() => {
     const backAction = () => {
-      if (searchBarVisible || onLongPressCoordinate || selectedLocation) {
-        screenEvents('', false, null, null, false)
-      } else { BackHandler.exitApp() }
+      if (currentScreen === 'MapScreen') {
+        if (searchBarVisible || onLongPressCoordinate || selectedLocation) {
+          screenEvents('', false, null, null, false)
+        } else { BackHandler.exitApp() }
+      } else { navigation.goBack() }
       return true;
     };
     const backHandler = BackHandler.addEventListener(
@@ -45,6 +48,7 @@ const MapScreen = ({ navigation }) => {
 
   useFocusEffect(
     React.useCallback(() => {
+      setCurrentScreen(route.name)
       setOnLongPressCoordinate(null)
       screenEvents('', false, null, null, false)
     }, [])
@@ -58,7 +62,7 @@ const MapScreen = ({ navigation }) => {
     await DbManager.getAllLocations()
       .then(res => setDbLocations(res))
   }
-  
+
   const getDeviceCoordinate = () => {
     return new Promise((resolve) => {
       Geolocation.getCurrentPosition(
